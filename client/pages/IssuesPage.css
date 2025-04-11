@@ -1,0 +1,83 @@
+/* src/pages/IssuesPage.css */
+
+.page-wrapper {
+    padding: 2rem;
+}
+
+.issues-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.issues-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.issues-search {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.issues-create-button {
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.issues-create-button:hover {
+    background-color: #333;
+}
+
+.board-columns {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.board-column {
+    flex: 1;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 300px;
+    border: 1px solid #ddd;
+}
+
+.board-column-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.task-card {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.task-card:hover {
+    background-color: #f0f0f0;
+}
+
+.task-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}

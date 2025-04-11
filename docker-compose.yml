@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  client:
+    build: .
+    ports:
+      - '3000:80'
+    restart: always
+    depends_on:
+      - server
+
+  server:
+    build: ./server
+    ports:
+      - "4000:8080"
+    restart: always
