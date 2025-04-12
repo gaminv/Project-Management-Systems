@@ -3,7 +3,7 @@ import { Task, User, Board } from '../../types'
 import './TaskModal.css'
 import { useUsers } from '../../api/users'
 import { useBoards } from '../../api/boards'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 interface Props {
     task?: Task
@@ -17,7 +17,6 @@ const normalizePriorityFromBackend = (priority: string): 'low' | 'medium' | 'hig
         medium: 'medium',
         high: 'high',
     }
-
     return map[priority.toLowerCase()] || 'medium'
 }
 
@@ -33,7 +32,6 @@ const normalizeStatusFromBackend = (status: string): 'todo' | 'in-progress' | 'd
         ToDo: 'todo',
         Backlog: 'todo',
     }
-
     return map[status.toLowerCase()] || 'todo'
 }
 
@@ -58,15 +56,15 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
     const { data: users = [] } = useUsers()
     const { data: boards = [] } = useBoards()
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const isOnBoardPage = location.pathname.startsWith('/boards/')
 
     useEffect(() => {
         if (task) {
-            console.log('Поступившая задача:', task)
-
             const normalizedStatus = normalizeStatusFromBackend(task.status)
             const normalizedPriority = normalizePriorityFromBackend(task.priority)
 
-            // Найдём доску по boardName
             const matchedBoard = boards.find((b) => b.name === task.boardName)
 
             setForm({
@@ -76,7 +74,7 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 priority: normalizedPriority,
                 status: normalizedStatus,
                 assigneeId: String(task.assignee?.id ?? ''),
-                boardId: matchedBoard ? String(matchedBoard.id) : '', // 🧠 восстанавливаем ID по названию!
+                boardId: matchedBoard ? String(matchedBoard.id) : String(task.boardId ?? ''),
             })
         } else {
             setForm({
@@ -89,17 +87,13 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 boardId: '',
             })
         }
-    }, [task, boards]) 
-
+    }, [task, boards])
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }))
+        setForm((prev) => ({ ...prev, [name]: value }))
         setErrors((prev) => ({ ...prev, [name]: '' }))
     }
 
@@ -112,7 +106,6 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
         }
 
         setErrors(newErrors)
-
         const hasError = Object.values(newErrors).some((err) => err)
         if (hasError) return
 
@@ -120,15 +113,24 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
     }
 
     const handleGoToBoard = () => {
-        if (task?.boardName && task?.id) {
-            const board = boards.find((b) => b.name === task.boardName)
-            if (board) {
-                navigate(`/boards/${board.id}?taskId=${task.id}`)
-                onClose()
-            } else {
-                console.warn('Не найдена доска по названию:', task.boardName)
-            }
+        if (!task) return
+
+        // Пробуем взять boardId напрямую
+        let boardId = task.boardId
+
+        // Если boardId отсутствует — пробуем найти доску по имени
+        if (!boardId && task.boardName && boards.length > 0) {
+            const matched = boards.find(b => b.name === task.boardName)
+            if (matched) boardId = matched.id
         }
+
+        if (!boardId) {
+            console.warn('❌ Не удалось найти boardId для перехода к доске')
+            return
+        }
+
+        navigate(`/boards/${boardId}?taskId=${task.id}`)
+        onClose()
     }
 
 
@@ -172,7 +174,9 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 onChange={handleChange}
                 className={errors.assigneeId ? 'input-error' : ''}
             >
-                <option value="">Выберите исполнителя</option>
+                <option value="" disabled hidden>
+                    Выберите исполнителя
+                </option>
                 {users.map((user: User) => (
                     <option key={user.id} value={user.id}>
                         {user.fullName}
@@ -186,8 +190,11 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 value={form.boardId}
                 onChange={handleChange}
                 className={errors.boardId ? 'input-error' : ''}
+                disabled={isOnBoardPage}
             >
-                <option value="">Выберите доску</option>
+                <option value="" disabled hidden>
+                    Выберите доску
+                </option>
                 {boards.map((board: Board) => (
                     <option key={board.id} value={String(board.id)}>
                         {board.name}
@@ -203,10 +210,15 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 </button>
             </div>
 
-            {task && (
-                <button className="go-to-board" onClick={handleGoToBoard}>
-                    Перейти к доске
-                </button>
+            {task && !isOnBoardPage && (
+                <>
+                    <pre style={{ fontSize: '0.75rem', color: '#aaa' }}>
+                        (debug) task.boardId = {task.boardId}, task.id = {task.id}
+                    </pre>
+                    <button className="go-to-board" onClick={handleGoToBoard}>
+                        Перейти к доске
+                    </button>
+                </>
             )}
         </div>
     )

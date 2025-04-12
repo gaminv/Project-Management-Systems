@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { useTasksByBoard } from '../api/tasks'
+import { useTasksByBoard, useUpdateTaskStatus } from '../api/tasks'
 import { Task, Status } from '../types'
 import {
     DragDropContext,
@@ -22,21 +22,22 @@ const statusLabels: Record<Status, string> = {
 const BoardPage: React.FC = () => {
     const { id } = useParams<{ id: string }>()
     const { data: tasks, isLoading, error } = useTasksByBoard(id ?? '')
+    const { openModal } = useTaskModal()
+    const [searchParams] = useSearchParams()
+    const { data: boards = [] } = useBoards()
+    const updateTaskStatus = useUpdateTaskStatus()
+
+    const board = boards.find((b) => String(b.id) === id)
+
     const [columns, setColumns] = useState<Record<Status, Task[]>>({
         todo: [],
         'in-progress': [],
         done: [],
     })
 
-    const { openModal } = useTaskModal()
-    const [searchParams] = useSearchParams()
-
-    const { data: boards = [] } = useBoards()
-    const board = boards.find((b) => String(b.id) === id)
-
     useEffect(() => {
         if (tasks) {
-            const normalized = tasks.map(task => ({
+            const normalized = tasks.map((task) => ({
                 ...task,
                 status: task.status
                     .toLowerCase()
@@ -44,10 +45,10 @@ const BoardPage: React.FC = () => {
                     .replace('backlog', 'todo') as Status,
             }))
 
-            const grouped = {
-                todo: [] as Task[],
-                'in-progress': [] as Task[],
-                done: [] as Task[],
+            const grouped: Record<Status, Task[]> = {
+                todo: [],
+                'in-progress': [],
+                done: [],
             }
 
             for (const task of normalized) {
@@ -58,10 +59,8 @@ const BoardPage: React.FC = () => {
 
             const taskId = searchParams.get('taskId')
             if (taskId) {
-                const found = normalized.find(t => t.id === taskId)
-                if (found) {
-                    openModal(found)
-                }
+                const found = normalized.find((t) => t.id === taskId)
+                if (found) openModal(found)
             }
         }
     }, [tasks, searchParams, openModal])
@@ -76,9 +75,11 @@ const BoardPage: React.FC = () => {
         const sourceTasks = Array.from(columns[sourceCol])
         const [moved] = sourceTasks.splice(source.index, 1)
 
+        if (!moved) return
+
         if (sourceCol === destCol) {
             sourceTasks.splice(destination.index, 0, moved)
-            setColumns(prev => ({
+            setColumns((prev) => ({
                 ...prev,
                 [sourceCol]: sourceTasks,
             }))
@@ -86,14 +87,18 @@ const BoardPage: React.FC = () => {
             const destTasks = Array.from(columns[destCol])
             moved.status = destCol
             destTasks.splice(destination.index, 0, moved)
-            setColumns(prev => ({
+            setColumns((prev) => ({
                 ...prev,
                 [sourceCol]: sourceTasks,
                 [destCol]: destTasks,
             }))
-        }
 
-        // TODO: можно подключить API для сохранения
+            updateTaskStatus.mutate({
+                taskId: moved.id,
+                status: destCol,
+                order: destination.index,
+            })
+        }
     }
 
     if (!id) return <div>Не указан ID доски</div>
@@ -105,7 +110,7 @@ const BoardPage: React.FC = () => {
             <h2>{board ? `Доска проекта: ${board.name}` : `Доска проекта #${id}`}</h2>
             <DragDropContext onDragEnd={onDragEnd}>
                 <div style={{ display: 'flex', gap: 20 }}>
-                    {statuses.map(status => (
+                    {statuses.map((status) => (
                         <Droppable key={status} droppableId={status}>
                             {(provided, snapshot) => (
                                 <div
@@ -133,10 +138,11 @@ const BoardPage: React.FC = () => {
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
+                                                    onClick={() => openModal(task)}
                                                     style={{
                                                         padding: '0.5rem',
                                                         marginBottom: '0.5rem',
-                                                        border: '1px solid #aaa',
+                                                        border: '1px solid #000',
                                                         borderRadius: 4,
                                                         background: snapshot.isDragging
                                                             ? '#ede7f6'
@@ -148,7 +154,6 @@ const BoardPage: React.FC = () => {
                                                         cursor: 'pointer',
                                                         ...provided.draggableProps.style,
                                                     }}
-                                                    onClick={() => openModal(task)}
                                                 >
                                                     <strong>{task.title}</strong>
                                                     <div
