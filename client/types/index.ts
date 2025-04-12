@@ -20,7 +20,6 @@ export interface Task {
         fullName: string
         email?: string
     }
-    projectId: string 
     boardId?: string 
     boardName?: string 
 }

@@ -4,35 +4,93 @@ import './TaskModal.css'
 import { useUsers } from '../../api/users'
 import { useBoards } from '../../api/boards'
 import { useNavigate } from 'react-router-dom'
-import { useUpdateTask } from '../../api/tasks'
 
 interface Props {
     task?: Task
     onClose: () => void
-    onSubmit?: (task: Task) => void
+    onSubmit: (task: Task) => void
+}
+
+const normalizePriorityFromBackend = (priority: string): 'low' | 'medium' | 'high' => {
+    const map: Record<string, 'low' | 'medium' | 'high'> = {
+        low: 'low',
+        medium: 'medium',
+        high: 'high',
+    }
+
+    return map[priority.toLowerCase()] || 'medium'
+}
+
+const normalizeStatusFromBackend = (status: string): 'todo' | 'in-progress' | 'done' => {
+    const map: Record<string, 'todo' | 'in-progress' | 'done'> = {
+        backlog: 'todo',
+        inprogress: 'in-progress',
+        'in-progress': 'in-progress',
+        InProgress: 'in-progress',
+        done: 'done',
+        Done: 'done',
+        todo: 'todo',
+        ToDo: 'todo',
+        Backlog: 'todo',
+    }
+
+    return map[status.toLowerCase()] || 'todo'
 }
 
 const TaskModal = ({ task, onClose, onSubmit }: Props) => {
-    const [form, setForm] = useState<Task>(
-        task || {
-            id: '',
-            title: '',
-            description: '',
-            priority: 'low',
-            status: 'todo',
-            assigneeId: '',
-            projectId: '',
-        }
-    )
+    const [form, setForm] = useState<Task>({
+        id: '',
+        title: '',
+        description: '',
+        priority: 'low',
+        status: 'todo',
+        assigneeId: '',
+        boardId: '',
+    })
+
+    const [errors, setErrors] = useState({
+        title: '',
+        description: '',
+        assigneeId: '',
+        boardId: '',
+    })
 
     const { data: users = [] } = useUsers()
     const { data: boards = [] } = useBoards()
     const navigate = useNavigate()
-    const { mutate: updateTask } = useUpdateTask()
 
     useEffect(() => {
-        if (task) setForm(task)
-    }, [task])
+        if (task) {
+            console.log('Поступившая задача:', task)
+
+            const normalizedStatus = normalizeStatusFromBackend(task.status)
+            const normalizedPriority = normalizePriorityFromBackend(task.priority)
+
+            // Найдём доску по boardName
+            const matchedBoard = boards.find((b) => b.name === task.boardName)
+
+            setForm({
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                priority: normalizedPriority,
+                status: normalizedStatus,
+                assigneeId: String(task.assignee?.id ?? ''),
+                boardId: matchedBoard ? String(matchedBoard.id) : '', // 🧠 восстанавливаем ID по названию!
+            })
+        } else {
+            setForm({
+                id: '',
+                title: '',
+                description: '',
+                priority: 'low',
+                status: 'todo',
+                assigneeId: '',
+                boardId: '',
+            })
+        }
+    }, [task, boards]) 
+
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -42,45 +100,37 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
             ...prev,
             [name]: value,
         }))
+        setErrors((prev) => ({ ...prev, [name]: '' }))
     }
 
     const handleSubmit = () => {
-        if (form.title.trim() === '') return
-
-        if (task) {
-            updateTask({
-                taskId: task.id,
-                data: {
-                    title: form.title,
-                    description: form.description,
-                    priority:
-                        form.priority === 'low'
-                            ? 'Low'
-                            : form.priority === 'medium'
-                                ? 'Medium'
-                                : 'High',
-                    status:
-                        form.status === 'todo'
-                            ? 'Backlog'
-                            : form.status === 'in-progress'
-                                ? 'InProgress'
-                                : 'Done',
-                    assigneeId: form.assigneeId,
-                    boardId: form.projectId,
-                },
-            })
-            onClose()
-        } else {
-            onSubmit?.(form)
+        const newErrors = {
+            title: form.title.trim() ? '' : 'Название обязательно',
+            description: form.description.trim() ? '' : 'Описание обязательно',
+            assigneeId: form.assigneeId ? '' : 'Выберите исполнителя',
+            boardId: form.boardId ? '' : 'Выберите доску',
         }
+
+        setErrors(newErrors)
+
+        const hasError = Object.values(newErrors).some((err) => err)
+        if (hasError) return
+
+        onSubmit(form)
     }
 
     const handleGoToBoard = () => {
-        if (form.projectId) {
-            navigate(`/boards/${form.projectId}`)
-            onClose()
+        if (task?.boardName && task?.id) {
+            const board = boards.find((b) => b.name === task.boardName)
+            if (board) {
+                navigate(`/boards/${board.id}?taskId=${task.id}`)
+                onClose()
+            } else {
+                console.warn('Не найдена доска по названию:', task.boardName)
+            }
         }
     }
+
 
     return (
         <div className="task-modal">
@@ -91,14 +141,18 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 placeholder="Название задачи"
                 value={form.title}
                 onChange={handleChange}
+                className={errors.title ? 'input-error' : ''}
             />
+            {errors.title && <div className="error-text">{errors.title}</div>}
 
             <textarea
                 name="description"
                 placeholder="Описание"
                 value={form.description}
                 onChange={handleChange}
+                className={errors.description ? 'input-error' : ''}
             />
+            {errors.description && <div className="error-text">{errors.description}</div>}
 
             <select name="priority" value={form.priority} onChange={handleChange}>
                 <option value="low">Низкий приоритет</option>
@@ -112,7 +166,12 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 <option value="done">Done</option>
             </select>
 
-            <select name="assigneeId" value={form.assigneeId} onChange={handleChange}>
+            <select
+                name="assigneeId"
+                value={form.assigneeId}
+                onChange={handleChange}
+                className={errors.assigneeId ? 'input-error' : ''}
+            >
                 <option value="">Выберите исполнителя</option>
                 {users.map((user: User) => (
                     <option key={user.id} value={user.id}>
@@ -120,19 +179,28 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                     </option>
                 ))}
             </select>
+            {errors.assigneeId && <div className="error-text">{errors.assigneeId}</div>}
 
-            <select name="projectId" value={form.projectId} onChange={handleChange}>
+            <select
+                name="boardId"
+                value={form.boardId}
+                onChange={handleChange}
+                className={errors.boardId ? 'input-error' : ''}
+            >
                 <option value="">Выберите доску</option>
                 {boards.map((board: Board) => (
-                    <option key={board.id} value={board.id}>
+                    <option key={board.id} value={String(board.id)}>
                         {board.name}
                     </option>
                 ))}
             </select>
+            {errors.boardId && <div className="error-text">{errors.boardId}</div>}
 
             <div className="task-modal-actions">
                 <button onClick={handleSubmit}>{task ? 'Обновить' : 'Создать'}</button>
-                <button onClick={onClose} className="cancel-button">Отмена</button>
+                <button onClick={onClose} className="cancel-button">
+                    Отмена
+                </button>
             </div>
 
             {task && (

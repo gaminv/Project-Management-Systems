@@ -94,3 +94,14 @@
 .task-modal .go-to-board:hover {
     background: #eff6ff;
 }
+
+.input-error {
+    border: 1px solid red;
+}
+
+.error-text {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+}

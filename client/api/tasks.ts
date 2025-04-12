@@ -1,8 +1,9 @@
 // client/api/tasks.ts
 
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from './api'
 import { Task } from '../types'
+import { useBoards } from './boards'
 
 export interface UpdateStatusVars {
     taskId: string
@@ -11,11 +12,11 @@ export interface UpdateStatusVars {
 }
 
 export interface CreateTaskRequest {
-    title: string
-    description: string
-    priority: string
-    assigneeId: string
-    boardId: string
+    Title: string
+    Description: string
+    Priority: 'Low' | 'Medium' | 'High'
+    AssigneeID: number
+    BoardID: number
 }
 
 
@@ -33,18 +34,23 @@ export interface UpdateTaskData {
     description: string
     priority: 'Low' | 'Medium' | 'High'
     status: 'Backlog' | 'InProgress' | 'Done'
-    assigneeId: string
-    boardId: string
+    assigneeId: number     // ✅ not string
+    boardId: number        // ✅ not string
 }
 
 export const useTasksByBoard = (boardId: string) => {
+    const { data: boards = [] } = useBoards()
+
     return useQuery<Task[]>({
         queryKey: ['tasks', boardId],
         queryFn: async () => {
             const res = await api.get(`/boards/${boardId}`)
+
+            const boardName = boards.find(b => String(b.id) === boardId)?.name || '—'
+
             return res.data.data.map((task: any) => ({
                 ...task,
-                projectId: boardId, 
+                boardName: task.boardName ?? boardName,
             }))
         },
         enabled: !!boardId,
@@ -70,14 +76,24 @@ export const useUpdateTaskStatus = () => {
     })
 }
 
+
+
 export const useCreateTask = () => {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: async (task: CreateTaskRequest) => {
             const res = await api.post('/tasks/create', task)
             return res.data
         },
+        onSuccess: (_data, variables) => {
+            // Обновляем задачи после создания
+            queryClient.invalidateQueries({ queryKey: ['tasks'] })
+            queryClient.invalidateQueries({ queryKey: ['tasks', variables.BoardID] })
+        },
     })
 }
+
 
 export const useTasks = () => {
     return useQuery<Task[]>({
@@ -120,7 +136,14 @@ export const useUpdateTask = () => {
             taskId: string
             data: UpdateTaskData
         }) => {
-            const res = await api.put(`/tasks/update/${taskId}`, data)
+            const res = await api.put(`/tasks/update/${taskId}`, {
+                Title: data.title,
+                Description: data.description,
+                Priority: data.priority,
+                Status: data.status,
+                AssigneeID: data.assigneeId,
+                BoardID: data.boardId,
+            })
             return res.data
         },
     })

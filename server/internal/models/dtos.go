@@ -89,6 +89,7 @@ type UpdateTaskRequest struct {
 	Priority    string `json:"priority" enums:"Low,Medium,High" example:"Medium"`
 	Status      string `json:"status" enums:"Backlog,InProgress,Done" example:"Done"`
 	AssigneeID  uint   `json:"assigneeId" binding:"required"`
+	BoardID     uint   `json:"boardId" binding:"required"`
 }
 
 // UpdateTaskResponse содержит результат обновления задачи

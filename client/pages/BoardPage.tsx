@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useTasksByBoard } from '../api/tasks'
 import { Task, Status } from '../types'
 import {
@@ -9,6 +9,7 @@ import {
     DropResult,
 } from '@hello-pangea/dnd'
 import { useTaskModal } from '../contexts/TaskModalContext'
+import { useBoards } from '../api/boards'
 
 const statuses: Status[] = ['todo', 'in-progress', 'done']
 
@@ -28,6 +29,10 @@ const BoardPage: React.FC = () => {
     })
 
     const { openModal } = useTaskModal()
+    const [searchParams] = useSearchParams()
+
+    const { data: boards = [] } = useBoards()
+    const board = boards.find((b) => String(b.id) === id)
 
     useEffect(() => {
         if (tasks) {
@@ -50,8 +55,16 @@ const BoardPage: React.FC = () => {
             }
 
             setColumns(grouped)
+
+            const taskId = searchParams.get('taskId')
+            if (taskId) {
+                const found = normalized.find(t => t.id === taskId)
+                if (found) {
+                    openModal(found)
+                }
+            }
         }
-    }, [tasks])
+    }, [tasks, searchParams, openModal])
 
     const onDragEnd = (result: DropResult) => {
         const { source, destination } = result
@@ -89,7 +102,7 @@ const BoardPage: React.FC = () => {
 
     return (
         <div style={{ padding: '1rem' }}>
-            <h2>Доска проекта #{id}</h2>
+            <h2>{board ? `Доска проекта: ${board.name}` : `Доска проекта #${id}`}</h2>
             <DragDropContext onDragEnd={onDragEnd}>
                 <div style={{ display: 'flex', gap: 20 }}>
                     {statuses.map(status => (
