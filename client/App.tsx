@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import BoardPage from './pages/BoardPage'
 import BoardsPage from './pages/BoardsPage'
 import IssuesPage from './pages/IssuesPage'
-import Header from './components/Header'
-import TaskModal from './components/TaskModal'
+import Header from './components/Header/Header'
+import TaskModal from './components/TaskModal/TaskModal'
 import { useTaskModal } from './contexts/TaskModalContext'
 
 function App() {

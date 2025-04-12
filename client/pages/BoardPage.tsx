@@ -8,6 +8,7 @@ import {
     Draggable,
     DropResult,
 } from '@hello-pangea/dnd'
+import { useTaskModal } from '../contexts/TaskModalContext'
 
 const statuses: Status[] = ['todo', 'in-progress', 'done']
 
@@ -25,6 +26,8 @@ const BoardPage: React.FC = () => {
         'in-progress': [],
         done: [],
     })
+
+    const { openModal } = useTaskModal()
 
     useEffect(() => {
         if (tasks) {
@@ -129,8 +132,10 @@ const BoardPage: React.FC = () => {
                                                             ? '0 2px 8px rgba(0,0,0,0.25)'
                                                             : '0 2px 4px rgba(0,0,0,0.1)',
                                                         transition: 'background 0.2s ease',
+                                                        cursor: 'pointer',
                                                         ...provided.draggableProps.style,
                                                     }}
+                                                    onClick={() => openModal(task)}
                                                 >
                                                     <strong>{task.title}</strong>
                                                     <div

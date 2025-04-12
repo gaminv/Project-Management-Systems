@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { Task } from '../types'
 
 interface TaskModalContextProps {
@@ -29,6 +29,13 @@ export const TaskModalProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.log('Submit task:', updatedTask)
         closeTaskModal()
     }
+
+    // 🧠 Добавляем слушатель кастомного события
+    useEffect(() => {
+        const handleOpenModal = () => openModal()
+        window.addEventListener('openTaskModal', handleOpenModal)
+        return () => window.removeEventListener('openTaskModal', handleOpenModal)
+    }, [])
 
     return (
         <TaskModalContext.Provider

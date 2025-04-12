@@ -1,15 +1,15 @@
-// src/components/TaskModal.tsx
 import { useEffect, useState } from 'react'
-import { Task, Priority, Status, User, Board } from '../types'
+import { Task, User, Board } from '../../types'
 import './TaskModal.css'
-import { useUsers } from '../api/users'
-import { useBoards } from '../api/boards'
+import { useUsers } from '../../api/users'
+import { useBoards } from '../../api/boards'
 import { useNavigate } from 'react-router-dom'
+import { useUpdateTask } from '../../api/tasks'
 
 interface Props {
     task?: Task
     onClose: () => void
-    onSubmit: (task: Task) => void
+    onSubmit?: (task: Task) => void
 }
 
 const TaskModal = ({ task, onClose, onSubmit }: Props) => {
@@ -28,6 +28,7 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
     const { data: users = [] } = useUsers()
     const { data: boards = [] } = useBoards()
     const navigate = useNavigate()
+    const { mutate: updateTask } = useUpdateTask()
 
     useEffect(() => {
         if (task) setForm(task)
@@ -45,7 +46,33 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
 
     const handleSubmit = () => {
         if (form.title.trim() === '') return
-        onSubmit(form)
+
+        if (task) {
+            updateTask({
+                taskId: task.id,
+                data: {
+                    title: form.title,
+                    description: form.description,
+                    priority:
+                        form.priority === 'low'
+                            ? 'Low'
+                            : form.priority === 'medium'
+                                ? 'Medium'
+                                : 'High',
+                    status:
+                        form.status === 'todo'
+                            ? 'Backlog'
+                            : form.status === 'in-progress'
+                                ? 'InProgress'
+                                : 'Done',
+                    assigneeId: form.assigneeId,
+                    boardId: form.projectId,
+                },
+            })
+            onClose()
+        } else {
+            onSubmit?.(form)
+        }
     }
 
     const handleGoToBoard = () => {
@@ -85,24 +112,16 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 <option value="done">Done</option>
             </select>
 
-            <select
-                name="assigneeId"
-                value={form.assigneeId}
-                onChange={handleChange}
-            >
+            <select name="assigneeId" value={form.assigneeId} onChange={handleChange}>
                 <option value="">Выберите исполнителя</option>
                 {users.map((user: User) => (
                     <option key={user.id} value={user.id}>
-                        {user.name}
+                        {user.fullName}
                     </option>
                 ))}
             </select>
 
-            <select
-                name="projectId"
-                value={form.projectId}
-                onChange={handleChange}
-            >
+            <select name="projectId" value={form.projectId} onChange={handleChange}>
                 <option value="">Выберите доску</option>
                 {boards.map((board: Board) => (
                     <option key={board.id} value={board.id}>
