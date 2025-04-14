@@ -2,15 +2,19 @@ version: '3.8'
 
 services:
   client:
-    build: .
+    build:
+      context: .        # всё в корне
+      dockerfile: Dockerfile
     ports:
-      - '3000:80'
+      - '5173:80'
     restart: always
     depends_on:
       - server
 
   server:
-    build: ./server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     ports:
-      - "4000:8080"
+      - '4000:8080'
     restart: always
