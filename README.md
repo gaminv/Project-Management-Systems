@@ -3,13 +3,14 @@
 Avito PMS — это система управления проектами с drag-and-drop досками задач, фильтрацией, поиском и возможностью управления задачами через модальные окна.
 
 ## 🔧 Технологии
+> 📡 **API используется как основной способ взаимодействия между frontend и backend.** Все запросы на получение, создание, обновление и удаление задач и досок реализованы через HTTP API.
 
 ### Frontend
-- **React 18** — компонентный подход и экосистема.
+- **React ** — компонентный подход и экосистема.
 - **Vite** — сверхбыстрая сборка и dev-сервер.
 - **TypeScript** — строгая типизация.
 - **React Query** — кэширование и работа с API.
-- **React Router v6** — маршрутизация страниц.
+- **React Router ** — маршрутизация страниц.
 - **@hello-pangea/dnd** — drag-and-drop интерфейс доски задач.
 - **SASS** — модульные стили с вложенностью и переменными.
 
@@ -52,8 +53,8 @@ pms-app/
 ### Шаг 1: Клонировать репозиторий
 
 ```bash
-git clone https://github.com/your-username/pms-app.git
-cd pms-app
+git clone https://github.com/gaminv/Project-Management-Systems.git
+cd Project-Management-Systems
 ```
 
 ### Шаг 2: Запустить проект через Docker
@@ -62,17 +63,49 @@ cd pms-app
 docker-compose up --build
 ```
 
-Frontend будет доступен на [`http://localhost:3000`](http://localhost:3000)
+Frontend будет доступен на http://localhost:5173
 
-Backend — на [`http://localhost:8080`](http://localhost:8080)
+Backend — на http://localhost:4000
 
-## 🖼 Скриншоты
+## 🧪 Тестирование
+
+Проект покрыт unit-тестами с использованием **Jest**, **React Testing Library**, **Mock Service Worker (MSW)** и **React Query Testing Utilities**.
+
+✅ 100% покрытие кода:  
+- Все ключевые модули (`api`, `hooks`) протестированы  
+- Проверены edge-кейсы и асинхронное поведение
+ ![image](https://github.com/user-attachments/assets/72c31835-28cf-4489-a065-298a73b76f2a)
+
+  🛠 Для запуска:
+```bash
+cd client
+npm install --save-dev jest @types/jest ts-jest jest-environment-jsdom
+npm test
+npm test -- --coverage
+```
+
+## 🖼 Скриншоты интерфейса
+### 🗂 Все доски  
+![image](https://github.com/user-attachments/assets/20fddd20-576e-47ba-8b58-15ea8785b8c0)
+
+---
 
 ### 📋 Доска задач
-![Доска задач](client/screenshots/board.png)
+![image](https://github.com/user-attachments/assets/6ce28816-416b-460f-84bf-d6fffa107447)
+
+---
 
 ### ✅ Все задачи
-![Все задачи](client/screenshots/issues.png)
+![image](https://github.com/user-attachments/assets/a2b6abd8-6d1f-4152-8e44-59349311351a)
 
-### ➕ Модалка создания задачи
-![Модалка](client/screenshots/task-modal.png)
+---
+
+### ➕ Создание задачи
+![image](https://github.com/user-attachments/assets/962c1bcb-d361-4be0-95f7-ee2d1e99fc18)
+
+---
+
+### ✏️ Редактирование задачи 
+![image](https://github.com/user-attachments/assets/10a46a7d-e411-4232-9623-dbc2d0219281)
+
+
