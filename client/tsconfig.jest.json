@@ -3,11 +3,13 @@
     "compilerOptions": {
         "types": [
             "jest",
+            "node",
             "@testing-library/jest-dom"
         ]
     },
     "include": [
-        "client",
+        "__tests__api",
+        "setup.ts",
         "jest.setup.ts"
     ]
 }

@@ -1,15 +1,13 @@
-version: '3.8'
-
 services:
   client:
     build:
-      context: .        # всё в корне
+      context: ./client
       dockerfile: Dockerfile
     ports:
       - '5173:80'
-    restart: always
     depends_on:
       - server
+    restart: always
 
   server:
     build:

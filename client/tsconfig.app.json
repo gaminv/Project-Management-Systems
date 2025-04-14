@@ -1,3 +1,4 @@
+// tsconfig.app.json
 {
   "compilerOptions": {
     "incremental": true,
@@ -23,11 +24,18 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "types": [
+      "vite/client",
       "node",
-      "jest"
-    ] // ✅ Вот это нужно для describe/it/expect
+      "jest",
+      "@tanstack/react-query" 
+    ]
   },
   "include": [
-    "client"
-, "setup.ts", "__tests__api/tasks"  ]
+    "api",
+    "components",
+    "pages",
+    "types",
+    "__tests__api",
+    "setup.ts"
+  ]
 }
