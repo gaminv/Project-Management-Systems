@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { Task } from '../types'
+import { Task } from '../types/types'
 import { useCreateTask, useUpdateTask, UpdateTaskData } from '../api/tasks'
 import { useQueryClient } from '@tanstack/react-query'
 

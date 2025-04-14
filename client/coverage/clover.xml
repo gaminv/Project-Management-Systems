@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1744610091388" clover="3.2.0">
-  <project timestamp="1744610091389" name="All files">
+<coverage generated="1744611783333" clover="3.2.0">
+  <project timestamp="1744611783333" name="All files">
     <metrics statements="72" coveredstatements="72" conditionals="11" coveredconditionals="11" methods="27" coveredmethods="27" elements="110" coveredelements="110" complexity="0" loc="72" ncloc="72" packages="3" files="8" classes="8"/>
     <package name="api">
       <metrics statements="25" coveredstatements="25" conditionals="0" coveredconditionals="0" methods="8" coveredmethods="8"/>
-      <file name="api.ts" path="D:\проекты\Avito\pms-app\client\api\api.ts">
+      <file name="api.ts" path="D:\проекты\Avito\pms-app\client\src\api\api.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="5" type="stmt"/>
         <line num="4" count="5" type="stmt"/>
         <line num="11" count="5" type="stmt"/>
       </file>
-      <file name="boards.ts" path="D:\проекты\Avito\pms-app\client\api\boards.ts">
+      <file name="boards.ts" path="D:\проекты\Avito\pms-app\client\src\api\boards.ts">
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -19,7 +19,7 @@
         <line num="9" count="1" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
       </file>
-      <file name="teams.ts" path="D:\проекты\Avito\pms-app\client\api\teams.ts">
+      <file name="teams.ts" path="D:\проекты\Avito\pms-app\client\src\api\teams.ts">
         <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -32,7 +32,7 @@
         <line num="50" count="1" type="stmt"/>
         <line num="51" count="1" type="stmt"/>
       </file>
-      <file name="users.ts" path="D:\проекты\Avito\pms-app\client\api\users.ts">
+      <file name="users.ts" path="D:\проекты\Avito\pms-app\client\src\api\users.ts">
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -44,13 +44,13 @@
     </package>
     <package name="api.tasks">
       <metrics statements="42" coveredstatements="42" conditionals="9" coveredconditionals="9" methods="17" coveredmethods="17"/>
-      <file name="index.ts" path="D:\проекты\Avito\pms-app\client\api\tasks\index.ts">
+      <file name="index.ts" path="D:\проекты\Avito\pms-app\client\src\api\tasks\index.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
       </file>
-      <file name="mutations.ts" path="D:\проекты\Avito\pms-app\client\api\tasks\mutations.ts">
+      <file name="mutations.ts" path="D:\проекты\Avito\pms-app\client\src\api\tasks\mutations.ts">
         <metrics statements="18" coveredstatements="18" conditionals="4" coveredconditionals="4" methods="7" coveredmethods="7"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -71,7 +71,7 @@
         <line num="44" count="3" type="stmt"/>
         <line num="48" count="3" type="stmt"/>
       </file>
-      <file name="queries.ts" path="D:\проекты\Avito\pms-app\client\api\tasks\queries.ts">
+      <file name="queries.ts" path="D:\проекты\Avito\pms-app\client\src\api\tasks\queries.ts">
         <metrics statements="21" coveredstatements="21" conditionals="5" coveredconditionals="5" methods="10" coveredmethods="10"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -98,7 +98,7 @@
     </package>
     <package name="utils">
       <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
-      <file name="testUtils.tsx" path="D:\проекты\Avito\pms-app\client\utils\testUtils.tsx">
+      <file name="testUtils.tsx" path="D:\проекты\Avito\pms-app\client\src\utils\testUtils.tsx">
         <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
         <line num="2" count="5" type="stmt"/>
         <line num="4" count="5" type="stmt"/>

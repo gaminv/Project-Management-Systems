@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Task } from '../types'
+import { Task } from '../types/types'
 import './IssuesPage.css'
 import { useTaskModal } from '../contexts/TaskModalContext'
 import { useBoards } from '../api/boards'

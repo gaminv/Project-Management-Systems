@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import api from '../api'
-import { Task } from '../../types'
+import { Task } from '../../types/types'
 import { useBoards } from '../boards'
 import { UserTask } from './types'
 

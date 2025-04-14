@@ -1,15 +1,13 @@
 {
     "extends": "./tsconfig.app.json",
     "compilerOptions": {
-        "types": [
-            "jest",
-            "node",
-            "@testing-library/jest-dom"
-        ]
+        "composite": true,
+        "noEmit": true
     },
     "include": [
-        "__tests__api",
+        "src",
+        "vite-env.d.ts",
         "setup.ts",
-        "jest.setup.ts"
+        "__tests__api"
     ]
 }
