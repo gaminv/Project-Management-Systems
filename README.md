@@ -1,54 +1,78 @@
-# React + TypeScript + Vite
+# Avito PMS — Task Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Avito PMS — это система управления проектами с drag-and-drop досками задач, фильтрацией, поиском и возможностью управления задачами через модальные окна.
 
-Currently, two official plugins are available:
+## 🔧 Технологии
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Frontend
+- **React 18** — компонентный подход и экосистема.
+- **Vite** — сверхбыстрая сборка и dev-сервер.
+- **TypeScript** — строгая типизация.
+- **React Query** — кэширование и работа с API.
+- **React Router v6** — маршрутизация страниц.
+- **@hello-pangea/dnd** — drag-and-drop интерфейс доски задач.
+- **SASS** — модульные стили с вложенностью и переменными.
 
-## Expanding the ESLint configuration
+### Backend
+- **Golang** — высокая производительность, лаконичный синтаксис.
+- **SQLite** — встроенная БД, идеально подходит для небольших проектов.
+- **Chi Router** — легковесный HTTP роутер.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Инфраструктура
+- **Docker + Docker Compose** — контейнеризация, простота запуска и деплоя.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📁 Структура проекта
+
+```
+pms-app/
+│
+├── client/                   # frontend на React
+│   ├── components/           # переиспользуемые компоненты UI (Header, TaskModal и т.д.)
+│   ├── pages/                # страницы: BoardPage, IssuesPage и т.д.
+│   ├── api/                  # хуки и запросы к API (React Query)
+│   ├── types/                # глобальные типы: Task, User, Board и др.
+│   ├── contexts/             # контексты, например TaskModalContext
+│   ├── styles/               # SASS/SCSS стили
+│   └── main.tsx             # точка входа фронтенда
+│
+├── server/                   # backend на Go
+│   ├── cmd/                  # основная точка входа приложения
+│   ├── handlers/             # HTTP-хендлеры для CRUD операций
+│   ├── models/               # модели данных и логика
+│   ├── db/                   # инициализация и миграции SQLite
+│   └── routes.go             # маршруты chi
+│
+├── docker-compose.yml        # запуск client + server
+├── README.md                 # документация
+└── .env                      # переменные окружения
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Как запустить проект
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Шаг 1: Клонировать репозиторий
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+git clone https://github.com/your-username/pms-app.git
+cd pms-app
 ```
+
+### Шаг 2: Запустить проект через Docker
+
+```bash
+docker-compose up --build
+```
+
+Frontend будет доступен на [`http://localhost:3000`](http://localhost:3000)
+
+Backend — на [`http://localhost:8080`](http://localhost:8080)
+
+## 🖼 Скриншоты
+
+### 📋 Доска задач
+![Доска задач](client/screenshots/board.png)
+
+### ✅ Все задачи
+![Все задачи](client/screenshots/issues.png)
+
+### ➕ Модалка создания задачи
+![Модалка](client/screenshots/task-modal.png)
