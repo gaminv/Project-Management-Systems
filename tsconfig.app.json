@@ -21,9 +21,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": [
+      "node",
+      "jest"
+    ] // ✅ Вот это нужно для describe/it/expect
   },
   "include": [
     "client"
-  ]
+, "setup.ts", "__tests__api/tasks"  ]
 }
