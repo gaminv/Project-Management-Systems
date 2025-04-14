@@ -1,13 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, UseMutationResult } from '@tanstack/react-query'
 import api from '../api'
 import { CreateTaskRequest, UpdateStatusVars, UpdateTaskData } from './types'
 
-export const useCreateTask = () => {
+type CreateResponse = any 
+
+export const useCreateTask = (): UseMutationResult<CreateResponse, unknown, CreateTaskRequest> => {
     const queryClient = useQueryClient()
 
     return useMutation({
         mutationFn: async (task: CreateTaskRequest) => {
-            const res = await api.post('/tasks/create', task)
+            const controller = new AbortController()
+            const res = await api.post('/tasks/create', task, {
+                signal: controller.signal,
+            })
             return res.data
         },
         onSuccess: (_data, variables) => {
@@ -17,9 +22,10 @@ export const useCreateTask = () => {
     })
 }
 
-export const useUpdateTask = () => {
+export const useUpdateTask = (): UseMutationResult<any, unknown, { taskId: string; data: UpdateTaskData }> => {
     return useMutation({
-        mutationFn: async ({ taskId, data }: { taskId: string; data: UpdateTaskData }) => {
+        mutationFn: async ({ taskId, data }) => {
+            const controller = new AbortController()
             const res = await api.put(`/tasks/update/${taskId}`, {
                 Title: data.title,
                 Description: data.description,
@@ -27,15 +33,18 @@ export const useUpdateTask = () => {
                 Status: data.status,
                 AssigneeID: data.assigneeId,
                 BoardID: data.boardId,
+            }, {
+                signal: controller.signal,
             })
             return res.data
         },
     })
 }
 
-export const useUpdateTaskStatus = () => {
+export const useUpdateTaskStatus = (): UseMutationResult<any, unknown, UpdateStatusVars> => {
     return useMutation({
-        mutationFn: async ({ taskId, status, order }: UpdateStatusVars) => {
+        mutationFn: async ({ taskId, status, order }) => {
+            const controller = new AbortController()
             const serverStatus =
                 status === 'todo' ? 'Backlog' :
                     status === 'in-progress' ? 'InProgress' :
@@ -44,6 +53,8 @@ export const useUpdateTaskStatus = () => {
             const res = await api.put(`/tasks/updateStatus/${taskId}`, {
                 status: serverStatus,
                 order,
+            }, {
+                signal: controller.signal,
             })
             return res.data
         },

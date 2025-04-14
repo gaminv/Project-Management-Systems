@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Task } from '../types/types'
-import './IssuesPage.css'
+import './IssuesPage.scss'
 import { useTaskModal } from '../contexts/TaskModalContext'
 import { useBoards } from '../api/boards'
 import { useTasks, useTasksByBoard } from '../api/tasks'
+import { formatStatus } from '../utils/format' 
 
 const IssuesPage = () => {
     const { openModal, isOpen, selectedTask } = useTaskModal()
@@ -45,7 +46,6 @@ const IssuesPage = () => {
     }, [tasks, search, statusFilter, boardFilter, isOpen])
 
     useEffect(() => {
-        // Когда открыта модалка — сохраняем ID активной задачи
         if (isOpen && selectedTask) {
             setActiveTaskId(selectedTask.id)
         } else {
@@ -103,7 +103,7 @@ const IssuesPage = () => {
                     >
                         <div className="task-title">{task.title}</div>
                         <div className="task-meta">Приоритет: {task.priority}</div>
-                        <div className="task-meta">Статус: {task.status}</div>
+                        <div className="task-meta">Статус: {formatStatus(task.status)}</div>
                         <div className="task-meta">Исполнитель: {task.assignee?.fullName || '—'}</div>
                         <div className="task-meta">
                             Проект: {task.boardName || boards.find(b => b.id === task.boardId)?.name || '—'}

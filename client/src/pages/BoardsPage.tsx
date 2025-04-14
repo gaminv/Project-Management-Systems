@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useBoards } from '../api/boards'
-import './BoardsPage.css'
+import './BoardsPage.scss'
 
 const BoardsPage = () => {
     const { data: boards, isLoading, error } = useBoards()

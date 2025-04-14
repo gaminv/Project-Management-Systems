@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Task, User, Board } from '../../types/types'
-import './TaskModal.css'
+import './TaskModal.scss'
 import { useUsers } from '../../api/users'
 import { useBoards } from '../../api/boards'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -35,6 +35,8 @@ const normalizeStatusFromBackend = (status: string): 'todo' | 'in-progress' | 'd
     return map[status.toLowerCase()] || 'todo'
 }
 
+const DRAFT_KEY = 'taskDraft'
+
 const TaskModal = ({ task, onClose, onSubmit }: Props) => {
     const [form, setForm] = useState<Task>({
         id: '',
@@ -59,6 +61,7 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
     const location = useLocation()
 
     const isOnBoardPage = location.pathname.startsWith('/boards/')
+    const isEditingFromBoard = !!task && isOnBoardPage
 
     useEffect(() => {
         if (task) {
@@ -77,17 +80,23 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 boardId: matchedBoard ? String(matchedBoard.id) : String(task.boardId ?? ''),
             })
         } else {
-            setForm({
-                id: '',
-                title: '',
-                description: '',
-                priority: 'low',
-                status: 'todo',
-                assigneeId: '',
-                boardId: '',
-            })
+            const draft = localStorage.getItem(DRAFT_KEY)
+            if (draft) {
+                try {
+                    const parsed = JSON.parse(draft)
+                    setForm(parsed)
+                } catch (e) {
+                    console.warn('Ошибка парсинга черновика:', e)
+                }
+            }
         }
     }, [task, boards])
+
+    useEffect(() => {
+        if (!task) {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(form))
+        }
+    }, [form, task])
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -109,16 +118,15 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
         const hasError = Object.values(newErrors).some((err) => err)
         if (hasError) return
 
+        localStorage.removeItem(DRAFT_KEY)
         onSubmit(form)
     }
 
     const handleGoToBoard = () => {
         if (!task) return
 
-        // Пробуем взять boardId напрямую
         let boardId = task.boardId
 
-        // Если boardId отсутствует — пробуем найти доску по имени
         if (!boardId && task.boardName && boards.length > 0) {
             const matched = boards.find(b => b.name === task.boardName)
             if (matched) boardId = matched.id
@@ -132,7 +140,6 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
         navigate(`/boards/${boardId}?taskId=${task.id}`)
         onClose()
     }
-
 
     return (
         <div className="task-modal">
@@ -190,7 +197,7 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
                 value={form.boardId}
                 onChange={handleChange}
                 className={errors.boardId ? 'input-error' : ''}
-                disabled={isOnBoardPage}
+                disabled={isEditingFromBoard}
             >
                 <option value="" disabled hidden>
                     Выберите доску
@@ -211,14 +218,9 @@ const TaskModal = ({ task, onClose, onSubmit }: Props) => {
             </div>
 
             {task && !isOnBoardPage && (
-                <>
-                    <pre style={{ fontSize: '0.75rem', color: '#aaa' }}>
-                        (debug) task.boardId = {task.boardId}, task.id = {task.id}
-                    </pre>
-                    <button className="go-to-board" onClick={handleGoToBoard}>
-                        Перейти к доске
-                    </button>
-                </>
+                <button className="go-to-board" onClick={handleGoToBoard}>
+                    Перейти к доске
+                </button>
             )}
         </div>
     )

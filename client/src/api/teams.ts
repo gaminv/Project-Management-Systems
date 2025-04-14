@@ -1,6 +1,4 @@
-// client/api/teams.ts
-
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import api from './api'
 
 export interface Team {
@@ -11,19 +9,15 @@ export interface Team {
     boardsCount: number
 }
 
-export const useTeams = () => {
+export const useTeams = (): UseQueryResult<Team[]> => {
     return useQuery<Team[]>({
         queryKey: ['teams'],
-        queryFn: async () => {
-            const res = await api.get('/teams')
+        queryFn: async ({ signal }) => {
+            const res = await api.get('/teams', { signal })
             return res.data.data as Team[]
-        }
+        },
     })
 }
-
-// =======================================
-// Детали команды (GET /teams/:teamId)
-// =======================================
 
 export interface TeamDetails {
     id: string
@@ -43,11 +37,11 @@ export interface TeamDetails {
     }[]
 }
 
-export const useTeam = (teamId: string) => {
+export const useTeam = (teamId: string): UseQueryResult<TeamDetails> => {
     return useQuery<TeamDetails>({
         queryKey: ['team', teamId],
-        queryFn: async () => {
-            const res = await api.get(`/teams/${teamId}`)
+        queryFn: async ({ signal }) => {
+            const res = await api.get(`/teams/${teamId}`, { signal })
             return res.data.data as TeamDetails
         },
         enabled: !!teamId,

@@ -10,6 +10,7 @@ import {
 } from '@hello-pangea/dnd'
 import { useTaskModal } from '../contexts/TaskModalContext'
 import { useBoards } from '../api/boards'
+import './BoardsPage.scss'
 
 const statuses: Status[] = ['todo', 'in-progress', 'done']
 
@@ -79,10 +80,7 @@ const BoardPage: React.FC = () => {
 
         if (sourceCol === destCol) {
             sourceTasks.splice(destination.index, 0, moved)
-            setColumns((prev) => ({
-                ...prev,
-                [sourceCol]: sourceTasks,
-            }))
+            setColumns((prev) => ({ ...prev, [sourceCol]: sourceTasks }))
         } else {
             const destTasks = Array.from(columns[destCol])
             moved.status = destCol
@@ -101,30 +99,24 @@ const BoardPage: React.FC = () => {
         }
     }
 
-    if (!id) return <div>Не указан ID доски</div>
-    if (isLoading) return <div>Загрузка задач...</div>
-    if (error) return <div>Ошибка загрузки задач</div>
+    if (!id) return <div className="page-wrapper">Не указан ID доски</div>
+    if (isLoading) return <div className="page-wrapper">Загрузка задач...</div>
+    if (error) return <div className="page-wrapper">Ошибка загрузки задач</div>
 
     return (
-        <div style={{ padding: '1rem' }}>
-            <h2>{board ? `Доска проекта: ${board.name}` : `Доска проекта #${id}`}</h2>
+        <div className="page-wrapper">
+            <h2 className="issues-title">
+                {board ? `Доска проекта: ${board.name}` : `Доска проекта #${id}`}
+            </h2>
             <DragDropContext onDragEnd={onDragEnd}>
-                <div style={{ display: 'flex', gap: 20 }}>
+                <div className="board-columns">
                     {statuses.map((status) => (
                         <Droppable key={status} droppableId={status}>
                             {(provided, snapshot) => (
                                 <div
+                                    className={`board-column ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
-                                    style={{
-                                        flex: 1,
-                                        border: '1px solid #ccc',
-                                        borderRadius: 4,
-                                        padding: '0.5rem',
-                                        minHeight: 300,
-                                        background: snapshot.isDraggingOver ? '#e0f7fa' : '#f5f5f5',
-                                        transition: 'background 0.2s ease',
-                                    }}
                                 >
                                     <h4>{statusLabels[status]}</h4>
                                     {columns[status].map((task, index) => (
@@ -135,35 +127,17 @@ const BoardPage: React.FC = () => {
                                         >
                                             {(provided, snapshot) => (
                                                 <div
+                                                    className={`task-card ${snapshot.isDragging ? 'dragging' : ''}`}
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                     onClick={() => openModal(task)}
-                                                    style={{
-                                                        padding: '0.5rem',
-                                                        marginBottom: '0.5rem',
-                                                        border: '1px solid #000',
-                                                        borderRadius: 4,
-                                                        background: snapshot.isDragging
-                                                            ? '#ede7f6'
-                                                            : '#fff',
-                                                        boxShadow: snapshot.isDragging
-                                                            ? '0 2px 8px rgba(0,0,0,0.25)'
-                                                            : '0 2px 4px rgba(0,0,0,0.1)',
-                                                        transition: 'background 0.2s ease',
-                                                        cursor: 'pointer',
-                                                        ...provided.draggableProps.style,
-                                                    }}
+                                                    style={provided.draggableProps.style}
                                                 >
-                                                    <strong>{task.title}</strong>
-                                                    <div
-                                                        style={{
-                                                            fontSize: '0.85rem',
-                                                            color: '#666',
-                                                        }}
-                                                    >
-                                                        {task.description}
-                                                    </div>
+                                                    <div className="task-title">{task.title}</div>
+                                                    <div className="task-description">{task.description}</div>
+                                                    <div className="task-meta">Приоритет: {task.priority}</div>
+                                                    <div className="task-meta">Исполнитель: {task.assignee?.fullName || '—'}</div>
                                                 </div>
                                             )}
                                         </Draggable>

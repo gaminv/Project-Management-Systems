@@ -39,6 +39,10 @@
   "include": [
     "src",
     "setup.ts",
-    "jest.setup.ts"
+    "jest.setup.ts",
+    "node_modules/@tanstack/react-query"
+  ],
+  "exclude": [
+    "node_modules/@tanstack/react-query/build/query-codemods"
   ]
 }

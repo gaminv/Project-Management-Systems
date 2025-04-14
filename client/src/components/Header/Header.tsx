@@ -1,4 +1,3 @@
-// client/components/Header/Header.tsx
 import { NavLink } from 'react-router-dom'
 import logo from '../../assets/avito-logo.png'
 import './Header.css'

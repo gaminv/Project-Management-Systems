@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import api from '../api'
 import { Task } from '../../types/types'
 import { useBoards } from '../boards'
 import { UserTask } from './types'
 
-export const useTasks = () => {
+export const useTasks = (): UseQueryResult<Task[]> => {
     return useQuery<Task[]>({
         queryKey: ['tasks'],
         queryFn: async () => {
@@ -14,7 +14,7 @@ export const useTasks = () => {
     })
 }
 
-export const useTaskById = (taskId: string) => {
+export const useTaskById = (taskId: string): UseQueryResult<Task> => {
     return useQuery<Task>({
         queryKey: ['task', taskId],
         queryFn: async () => {
@@ -25,7 +25,7 @@ export const useTaskById = (taskId: string) => {
     })
 }
 
-export const useTasksByBoard = (boardId: string) => {
+export const useTasksByBoard = (boardId: string): UseQueryResult<Task[]> => {
     const { data: boards = [] } = useBoards()
 
     return useQuery<Task[]>({
@@ -42,7 +42,7 @@ export const useTasksByBoard = (boardId: string) => {
     })
 }
 
-export const useUserTasks = (userId: string) => {
+export const useUserTasks = (userId: string): UseQueryResult<UserTask[]> => {
     return useQuery<UserTask[]>({
         queryKey: ['userTasks', userId],
         queryFn: async () => {
